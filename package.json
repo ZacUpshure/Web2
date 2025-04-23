@@ -1,0 +1,28 @@
+{
+  "name": "uebung1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "httpServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/httpServer.js",
+    "build": "tsc",
+    "dev": "nodemon dist/httpServer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "mongodb": "^6.16.0",
+    "mongoose": "^8.13.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.1",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.8.3"
+  }
+}
