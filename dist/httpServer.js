@@ -8,7 +8,7 @@ app.use(express.json()); // body parser middleware (json -> req.body), sonst bei
 app.use('/api/publicUsers', publicUserRouter);
 // Server starten
 const server = app.listen(80, () => {
-    console.log(`Server running at http://localhost:80`);
+    console.log(`Server running at http://127.0.0.1:80`);
 });
 //Mongodb Verbindung aufbauen
 mongoose.connect("mongodb://localhost:27017").then(() => {

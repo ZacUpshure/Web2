@@ -12,7 +12,7 @@ app.use('/api/publicUsers', publicUserRouter);
 
 // Server starten
 const server: Server = app.listen(80, ():void => {
-    console.log(`Server running at http://localhost:80`);
+    console.log(`Server running at http://127.0.0.1:80`);
 });
 
 //Mongodb Verbindung aufbauen
