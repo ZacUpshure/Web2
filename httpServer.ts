@@ -1,17 +1,18 @@
 import express, { Express } from "express";
 import { Server } from 'http';
 import mongoose from "mongoose";
-import { userRouter } from './endpoints/user/UserRoute';
+import { publicUserRouter } from './endpoints/user/publicUsersRoute.js';
 
-const app: Express = express();
-app.use(express.json());
+const app: Express = express();     // erzeugt Express App und konfiguriert Web Server.
+app.use(express.json());            // body parser middleware (json -> req.body), sonst bei post und put undefined.
 
-// ✅ Mounten der Routing-Datei unter dem Prefix
-app.use('/api/publicUsers', userRouter);
+// alle anfragen die mit prefix beginnen werden an den router weitergeleitet.
+// benutzt die Routen.
+app.use('/api/publicUsers', publicUserRouter);
 
 // Server starten
-const server: Server = app.listen(3000, ():void => {
-    console.log(`Server running at http://localhost:3000`);
+const server: Server = app.listen(80, ():void => {
+    console.log(`Server running at http://localhost:80`);
 });
 
 //Mongodb Verbindung aufbauen
