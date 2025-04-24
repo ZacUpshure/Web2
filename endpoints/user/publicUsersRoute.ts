@@ -11,6 +11,7 @@ import {
     UpdateUserBody,
     ErrorResponse,
     UserResponse,
+    UserResponseDto,
     UserListResponse
 } from './../../types/UserDTO.js';
 
@@ -41,7 +42,7 @@ publicUserRouter.post('/', async (req: Request<{}, {}, CreateUserBody>, res: Res
         });
 
         // sendet antwort bei erfolgreicher erstellung. Ansonsten eine Fehlermeldung.
-        res.status(201).json({ message: 'User created successfully.', user: createdUser });
+        res.status(201).json({ message: 'User created successfully.', ...createdUser });
     } catch (error: any) {
         if (error.message === 'UserAlreadyExists') {
             res.status(409).json({ message: 'User already exists.' });
@@ -53,28 +54,28 @@ publicUserRouter.post('/', async (req: Request<{}, {}, CreateUserBody>, res: Res
 });
 
 // READ ALL
-publicUserRouter.get('/', async (_req: Request, res: Response<UserListResponse>): Promise<void> => {
+publicUserRouter.get('/', async (_req: Request, res: Response<UserResponseDto[]>): Promise<void> => {
     try {
         // aufruf Service um alle Nutzer abzurufen.
         const users = await findAllUsersService();
         // wenn korrekt werden alle User zurückgegeben.
-        res.status(200).json({ users });
+        res.status(200).json(users);
     } catch (error) {
         console.error(error);   // ansonsten error
-        res.status(500).json({ users: [] });
+        res.status(500).json([]);
     }
 });
 
 // READ BY ID
-publicUserRouter.get('/:userID', async (req: Request<{ userID: string }>, res: Response<UserResponse | ErrorResponse>): Promise<void> => {
+publicUserRouter.get('/:userID', async (req: Request<{ userID: string }>, res: Response<UserResponseDto | ErrorResponse>): Promise<void> => {
     try {
         // express liefert alle :params als string, daher parseInt(..) um benötigtes format zu bekommen.
         // fehler UserNotFound wird dadurch behandelt.
-        const userID:number = parseInt(req.params.userID, 10);
+        const userID: string = req.params.userID;
         // aufruf Service um User per ID zu suchen.
         const user = await findUserByIdService(userID);
         // bei erfolg gibt es die Antwort mit statuscode und user als Json.
-        res.status(200).json({ user });
+        res.status(200).json(user);
     } catch (error: any) {  // error.
         if (error.message === 'UserNotFound') {
             res.status(404).json({ message: 'User not found' });
@@ -89,11 +90,11 @@ publicUserRouter.get('/:userID', async (req: Request<{ userID: string }>, res: R
 publicUserRouter.put('/:userID', async (req: Request<{ userID: string }, {}, UpdateUserBody>, res: Response<UserResponse | ErrorResponse>): Promise<void> => {
     try {
         // userID: string -> number
-        const userID: number = parseInt(req.params.userID, 10);
+        const userID: string = req.params.userID;
         // aufruf Service um User mit bestimmter ID zu ändern mit den angaben aus dem Request body.
         const updatedUser = await updateUserService(userID, req.body);
         // response mit statuscode und message und geupdateter User.
-        res.status(200).json({ message: 'User updated successfully.', user: updatedUser });
+        res.status(200).json({ message: 'User updated successfully.', ...updatedUser });
     } catch (error: any) {   // error
         if (error.message === 'UserNotFound') {
             res.status(404).json({ message: 'User not found' });
@@ -108,11 +109,11 @@ publicUserRouter.put('/:userID', async (req: Request<{ userID: string }, {}, Upd
 publicUserRouter.delete('/:userID', async (req: Request<{ userID: string }>, res: Response<UserResponse | ErrorResponse>): Promise<void> => {
     try {
         // userID: string -> number
-        const userID: number = parseInt(req.params.userID, 10);
+        const userID: string = req.params.userID;
         // aufruf Service um User mit bestimmter ID zu löschen.
         const deletedUser = await deleteUserService(userID);
-        // response 200 mit json message
-        res.status(200).json({ message: 'User deleted successfully.', user: deletedUser });
+        // response 204 mit json message
+        res.status(204).end();
     } catch (error: any) { // error
         if (error.message === 'UserNotFound') {
             res.status(404).json({ message: 'User not found' });

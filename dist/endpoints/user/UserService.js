@@ -17,14 +17,12 @@ export async function createUserService(data) {
         userID: savedUser.userID,
         firstName: savedUser.firstName,
         lastName: savedUser.lastName,
-        isAdministrator: savedUser.isAdministrator
+        isAdministrator: savedUser.isAdministrator,
+        password: savedUser.password
     };
 }
 // search by ID
 export async function findUserByIdService(userID) {
-    // simple validierung prüft ob eine zahl vorliegt
-    if (isNaN(userID))
-        throw new Error('InvalidUserID');
     // aufruf auf das UserModel um einen user mit einer ID zu finden.
     const user = await UserModel.findOne({ userID });
     // Error wenn User nicht gefunden wurde.
@@ -35,7 +33,8 @@ export async function findUserByIdService(userID) {
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }
 // read all
@@ -47,14 +46,16 @@ export async function findAllUsersService() {
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     }));
 }
 // update
-// updateData kann einige oder alle Felder enthalten
 export async function updateUserService(userID, updateData) {
+    // Sicherheitshalber userID aus updateData entfernen, falls sie durchgeschmuggelt wird
+    const { userID: _, ...safeUpdate } = updateData;
     // aufruf vom UserModel um einen User mit der bestimmten ID zu bearbeiten mit einem übergebenen Inhalt aus dem req
-    const user = await UserModel.findOneAndUpdate({ userID }, updateData, {
+    const user = await UserModel.findOneAndUpdate({ userID }, safeUpdate, {
         new: true, // gibt den neuen datensatz zurück nicht den alten.
         runValidators: true // wendet alle mongoose validierungen auf alle Änderungen an.
     });
@@ -66,7 +67,8 @@ export async function updateUserService(userID, updateData) {
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }
 // delete
@@ -80,7 +82,9 @@ export async function deleteUserService(userID) {
     return {
         userID: user.userID,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }
 //# sourceMappingURL=UserService.js.map

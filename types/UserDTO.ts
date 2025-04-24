@@ -1,7 +1,7 @@
 // types/UserDTO.ts
 // DTO: Data Transfer Objekt: ist eine strukturierte Beschreibung von Daten.
 export interface CreateUserBody {
-    userID: number;
+    userID: string;
     firstName?: string;
     lastName?: string;
     isAdministrator?: boolean;
@@ -16,14 +16,15 @@ export interface UpdateUserBody {
 }
 
 export interface UserResponseDto {
-    userID: number;
+    userID: string;
     firstName?: string;
     lastName?: string;
     isAdministrator?: boolean;
+    password: string;
 }
 
 export interface CreateUserDto {
-    userID: number;
+    userID: string;
     firstName?: string;
     lastName?: string;
     isAdministrator?: boolean;

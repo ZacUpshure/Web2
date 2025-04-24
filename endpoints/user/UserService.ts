@@ -1,6 +1,6 @@
 import { UserModel } from './UserModel.js';
 import { IUser } from "./UserModel.js";
-import { CreateUserDto } from "./../../types/UserDTO.js";
+import {CreateUserDto, UpdateUserBody} from "./../../types/UserDTO.js";
 
 // create
 export async function createUserService( data: CreateUserDto ) {
@@ -23,14 +23,13 @@ export async function createUserService( data: CreateUserDto ) {
         userID: savedUser.userID,
         firstName: savedUser.firstName,
         lastName: savedUser.lastName,
-        isAdministrator: savedUser.isAdministrator
+        isAdministrator: savedUser.isAdministrator,
+        password: savedUser.password
     };
 }
 
 // search by ID
-export async function findUserByIdService(userID: number) {
-    // simple validierung prüft ob eine zahl vorliegt
-    if (isNaN(userID)) throw new Error('InvalidUserID');
+export async function findUserByIdService(userID: string) {
 
     // aufruf auf das UserModel um einen user mit einer ID zu finden.
     const user = await UserModel.findOne({ userID });
@@ -43,7 +42,8 @@ export async function findUserByIdService(userID: number) {
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }
 
@@ -58,15 +58,18 @@ export async function findAllUsersService() {
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     }));
 }
 
 // update
-// updateData kann einige oder alle Felder enthalten
-export async function updateUserService(userID: number, updateData: Partial<IUser>) {
+export async function updateUserService(userID: string, updateData: UpdateUserBody) {
+    // Sicherheitshalber userID aus updateData entfernen, falls sie durchgeschmuggelt wird
+    const { userID: _, ...safeUpdate } = updateData as any;
+
     // aufruf vom UserModel um einen User mit der bestimmten ID zu bearbeiten mit einem übergebenen Inhalt aus dem req
-    const user = await UserModel.findOneAndUpdate({ userID }, updateData, {
+    const user = await UserModel.findOneAndUpdate({ userID }, safeUpdate, {
         new: true,  // gibt den neuen datensatz zurück nicht den alten.
         runValidators: true // wendet alle mongoose validierungen auf alle Änderungen an.
     });
@@ -79,12 +82,13 @@ export async function updateUserService(userID: number, updateData: Partial<IUse
         userID: user.userID,
         firstName: user.firstName,
         lastName: user.lastName,
-        isAdministrator: user.isAdministrator
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }
 
 // delete
-export async function deleteUserService(userID: number) {
+export async function deleteUserService(userID: string) {
     // aufruf UserModel um einen User mit einer bestimmten ID zu finden und zu löschen.
     const user = await UserModel.findOneAndDelete({ userID });
 
@@ -95,6 +99,8 @@ export async function deleteUserService(userID: number) {
     return {
         userID: user.userID,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        isAdministrator: user.isAdministrator,
+        password: user.password
     };
 }

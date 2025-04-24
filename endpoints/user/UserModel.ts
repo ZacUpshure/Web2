@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 //Typescript Interface
 export interface IUser extends Document {
-    userID: number;
+    userID: string;
     firstName?: string;
     lastName?: string;
     isAdministrator: boolean;
@@ -12,7 +12,7 @@ export interface IUser extends Document {
 
 const UserSchema: Schema = new Schema<IUser>({
         userID: {
-            type: Number,
+            type: String,
             required: true,
             unique: true,
         },

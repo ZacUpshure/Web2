@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 const UserSchema = new Schema({
     userID: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
     },
