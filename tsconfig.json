@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["./**/*.ts"],                  // Alle TS-Dateien im Projekt (außer dist/node_modules)
+  "include": ["types", "**/*.ts"],               // Alle TS-Dateien im Projekt (außer dist/node_modules)
   "exclude": ["./node_modules", "../dist"]
 }
 
