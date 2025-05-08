@@ -1,4 +1,3 @@
-// middleware/requireSelfOrAdmin.ts
 import { Request, Response, NextFunction } from 'express';
 
 export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction): void => {

@@ -1,4 +1,4 @@
-// types/global.d.ts
+
 import { UserTokenPayload } from './AuthTypes';
 
 declare global {
