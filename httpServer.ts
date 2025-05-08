@@ -5,6 +5,7 @@ import { publicUserRouter } from './endpoints/user/publicUsersRoute.js';
 import { UserModel } from './endpoints/user/UserModel.js';
 import bcrypt from 'bcryptjs';
 import authRoute from './endpoints/authentication/AuthenticationRoute.js';
+import { privateUserRouter } from './endpoints/user/privateUsersRoute.js';
 
 const app: Express = express();     // erzeugt Express App und konfiguriert Web Server.
 app.use(express.json());            // body parser middleware (json -> req.body), sonst bei post und put undefined.
@@ -32,8 +33,11 @@ createAdminUser();
 // benutzt die Routen.
 app.use('/api/publicUsers', publicUserRouter);
 
-// authentication route einbinden.
+// authentication route.
 app.use('/api', authRoute);
+
+// private user route
+app.use('/api/users', privateUserRouter);
 
 // Server starten
 const server: Server = app.listen(80, ():void => {

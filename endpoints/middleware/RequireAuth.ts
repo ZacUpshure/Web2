@@ -4,7 +4,7 @@ import { UserTokenPayload } from '../../types/AuthTypes.js';
 import '../../types/global.js';
 
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction): Response | void => {
+export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     const authHeader: string | undefined = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
