@@ -6,6 +6,7 @@ import { UserModel } from './endpoints/user/UserModel.js';
 import bcrypt from 'bcryptjs';
 import authRoute from './endpoints/authentication/AuthenticationRoute.js';
 import { privateUserRouter } from './endpoints/user/privateUsersRoute.js';
+import { degreeCourseRouter } from "./endpoints/degreeCourse/DegreeCourseRoute.js";
 
 const app: Express = express();     // erzeugt Express App und konfiguriert Web Server.
 app.use(express.json());            // body parser middleware (json -> req.body), sonst bei post und put undefined.
@@ -38,6 +39,9 @@ app.use('/api', authRoute);
 
 // private user route
 app.use('/api/users', privateUserRouter);
+
+// degreeCourse route
+app.use('/api/degreeCourses', degreeCourseRouter);
 
 // Server starten
 const server: Server = app.listen(80, ():void => {

@@ -31,6 +31,7 @@ export async function createUserService( data: CreateUserDto ) {
 // search by ID
 export async function findUserByIdService(userID: string) {
 
+    console.log('Service: suche nach userID:', userID);
     // aufruf auf das UserModel um einen user mit einer ID zu finden.
     const user = await UserModel.findOne({ userID });
 

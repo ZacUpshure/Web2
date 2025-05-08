@@ -9,5 +9,8 @@ export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFuncti
         return next();
     }
 
+    console.log('req.user.userID:', req.user?.userID);
+    console.log('req.params.userID:', req.params.userID);
+
     res.status(403).json({ message: 'Forbidden – Not your resource or not an admin' });
 };
