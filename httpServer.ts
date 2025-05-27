@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import { Server } from 'http';
+import https from 'https';
 import mongoose from "mongoose";
 import { publicUserRouter } from './endpoints/user/publicUsersRoute.js';
 import { UserModel } from './endpoints/user/UserModel.js';
@@ -7,6 +8,12 @@ import bcrypt from 'bcryptjs';
 import authRoute from './endpoints/authentication/AuthenticationRoute.js';
 import { privateUserRouter } from './endpoints/user/privateUsersRoute.js';
 import { degreeCourseRouter } from "./endpoints/degreeCourse/DegreeCourseRoute.js";
+import degreeCourseApplicationRoutes from "./endpoints/degreeCourse/DegreeCourseApplicationRoutes.js";
+import abnahmeRoute  from './endpoints/abnahme/abnahmeRoute.js';
+import * as fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const app: Express = express();     // erzeugt Express App und konfiguriert Web Server.
 app.use(express.json());            // body parser middleware (json -> req.body), sonst bei post und put undefined.
@@ -43,10 +50,29 @@ app.use('/api/users', privateUserRouter);
 // degreeCourse route
 app.use('/api/degreeCourses', degreeCourseRouter);
 
-// Server starten
-const server: Server = app.listen(80, ():void => {
-    console.log(`Server running at http://127.0.0.1:80`);
+// degreeCourseApplication
+app.use('/api/degreeCourseApplications', degreeCourseApplicationRoutes);
+
+// abnahme 1
+app.use('/api/abnahme', abnahmeRoute);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, './certs/key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, './certs/cert.pem')),
+};
+
+// HTTPS-Server starten
+https.createServer(sslOptions, app).listen(443, (): void => {
+    console.log('HTTPS Server läuft auf https://localhost:443');
 });
+
+// Server starten
+// const server: Server = app.listen(80, ():void => {
+//    console.log(`Server running at http://127.0.0.1:80`);
+// });
 
 //Mongodb Verbindung aufbauen
 mongoose.connect("mongodb://localhost:27017").then((): void => {

@@ -1,8 +1,38 @@
-import express from 'express';
-import { authenticateUser } from './AuthenticationService.js';
-const router = express.Router();
-router.get('/authenticate', (req, res) => {
-    authenticateUser(req, res);
+import { Router } from 'express';
+import { authenticateUser2, AuthenticationError } from './AuthenticationService.js';
+// neuer Router.
+const router = Router();
+// GET https://localhost/api/authenticate
+router.get('/authenticate', async (req, res) => {
+    try {
+        // 1) Header auslesen
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Basic ')) {
+            res.status(401).json({ message: 'Missing or invalid Authorization header' });
+            return;
+        }
+        // 2) Base64-Teil extrahieren und decodieren
+        const base64Credentials = authHeader.split(' ')[1];
+        const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+        const [userID, password] = credentials.split(':');
+        // 3) Service aufrufen
+        const token = await authenticateUser2(userID, password);
+        // schreibt das JWT in den res header
+        res.setHeader('Authorization', `Bearer ${token}`);
+        // 4) Response
+        // antwortet den client mit den user daten.
+        res.status(200).json({ message: 'User authenticated!' });
+    }
+    catch (err) {
+        if (err instanceof AuthenticationError) {
+            res.status(401).json({ message: err.message });
+        }
+        else {
+            console.error(err);
+            res.status(500).json({ message: 'Interner Serverfehler' });
+        }
+    }
 });
+//exportiert Router als standard export.
 export default router;
 //# sourceMappingURL=AuthenticationRoute.js.map

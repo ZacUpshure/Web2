@@ -1,14 +1,9 @@
-import { UserModel } from '../user/UserModel.js';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/jwt.js';
-export class AuthenticationError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'AuthenticationError';
-    }
-}
-export const authenticateUser = async (req, res) => {
-    // ruft den wert von http header ab für authorization (kann undefined sein).
+import { UserModel } from "../user/UserModel.js";
+export const getAdmins = async (req, res) => {
+    //AUTH
+    // ruft authorization von http header ab.
     const authHeader = req.headers.authorization;
     // prüft ob der header fehlt oder nicht mit basic anfängt.
     if (!authHeader || !authHeader.startsWith('Basic ')) {
@@ -36,34 +31,14 @@ export const authenticateUser = async (req, res) => {
     const token = generateToken({ id: user._id, isAdministrator: user.isAdministrator });
     // schreibt das JWT in den res header
     res.setHeader('Authorization', `Bearer ${token}`);
+    //GET ALL ADMINS
+    // aufruf UserModel um alle einträge abzurufen.
+    const users = await UserModel.find({ isAdministrator: true });
     // antwortet den client mit den user daten.
-    return res.status(200).json({
+    // user in einer Liste wiedergeben.
+    return res.status(200).json(users.map(user => ({
         userID: user.userID,
         isAdministrator: user.isAdministrator,
-        firstName: user.firstName,
-        lastName: user.lastName
-    });
+    })));
 };
-export async function authenticateUser2(userID, password) {
-    // 1. Validierung der Eingaben
-    if (!userID || !password) {
-        throw new AuthenticationError('Benutzername und Passwort sind erforderlich');
-    }
-    // 2) User aus der DB holen
-    const user = await UserModel.findOne({ userID });
-    if (!user) {
-        // keine Details verraten, damit man nicht herausfinden kann, ob nur der Username falsch war
-        throw new AuthenticationError('Ungültige Anmeldeinformationen');
-    }
-    // 2. Prüfe Credentials (z.B. gegen Datenbank)
-    // vergleicht das password aus dem input mit dem hash aus der DB.
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    // wenn nicht übereinstimmend, dann 401.
-    if (!isPasswordValid) {
-        throw new AuthenticationError('Benutzername und Passwort sind erforderlich');
-    }
-    // 3. Erstelle und gib ein Token zurück
-    const token = generateToken({ userId: user._id, isAdministrator: user.isAdministrator });
-    return token;
-}
-//# sourceMappingURL=AuthenticationService.js.map
+//# sourceMappingURL=abnahmeService.js.map

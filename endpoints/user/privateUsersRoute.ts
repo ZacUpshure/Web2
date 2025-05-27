@@ -8,7 +8,8 @@ import {
     findAllUsersService,
     findUserByIdService,
     updateUserService,
-    deleteUserService
+    deleteUserService,
+    createUserService
 } from './UserService.js';
 
 // erstellt Router
@@ -32,12 +33,52 @@ privateUserRouter.get('/:userID', requireSelfOrAdmin, async (req, res): Promise<
     res.status(200).json(user); // ohne Passwort.
 });
 
+// POST /api/users -> Admin ist der einzige der neue Nutzer anlegen darf
+privateUserRouter.post('/', requireAdmin, async (req, res): Promise<void> => {
+    try {
+        const { userID, password, firstName, lastName, isAdministrator } = req.body;
+        const user = await createUserService({userID, password, firstName, lastName, isAdministrator});
+        res.status(201).json(user); // ohne Passwort.
+    } catch (error: any) {
+        if (error.message === 'UserAlreadyExists') {
+            res.status(409).json({ error: 'UserAlreadyExists' });
+        } else {
+            res.status(500).json({ error: 'internalServerError' });
+        }
+    }
+});
+
 // PUT /api/users/:userID -> Admin oder sich selbst.
 privateUserRouter.put('/:userID', requireSelfOrAdmin, async (req, res): Promise<void> => {
-    const { firstName, lastName } = req.body;
-    // ruft user service update user auf.
-    const updatedUser = await updateUserService(req.params.userID, { firstName, lastName });
-    res.status(200).json({ message: 'User updated.', user: updatedUser });
+    try {
+        const { firstName, lastName } = req.body;
+
+        // existierenden nutzer abrufen
+        const existingUser = await findUserByIdService(req.params.userID);
+        if (!existingUser) {
+            throw new Error('UserNotFound');
+        }
+
+        // abgleichen ob eine änderung stattgefunden hat um zb auch die änderung von userID abzufangen
+        if (
+            (firstName === undefined || existingUser.firstName === firstName) &&
+            (lastName === undefined || existingUser.lastName === lastName)
+        ) {
+            res.status(200).json({
+                message: 'No changes applied.',
+            });
+        }
+
+        // ruft user service update user auf.
+        const updatedUser = await updateUserService(req.params.userID, { firstName, lastName });
+        res.status(200).json({ message: 'User updated.', ...updatedUser });
+    } catch (error: any) {
+        if ( error.message === 'UserNotFound') {
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            res.status(500).json({ error: 'internalServerError' });
+        }
+    }
 });
 
 // DELETE /api/users/:userID -> Nur Admin
